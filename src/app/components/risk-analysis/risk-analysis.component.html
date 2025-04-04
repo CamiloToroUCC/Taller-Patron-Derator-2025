@@ -1,0 +1,78 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="wallet-info">
+      <div class="asset-value">
+        <h2>Total Asset Value</h2>
+        <p>{{ totalAssetValue }}</p>
+      </div>
+    </div>
+  </header>
+  
+  <div class="watchlist">
+    <h3>Activos Disponibles para Inversión</h3>
+    <ul>
+      <li *ngFor="let asset of watchlist" (click)="selectAsset(asset)" 
+          [ngClass]="{'selected': selectedAsset?.symbol === asset.symbol}">
+        <div class="asset">
+          <span class="symbol">{{ asset.symbol }}</span>
+          <span class="price">{{ asset.price }}</span>
+          <span class="change" 
+                [ngClass]="{'positive': asset.change.startsWith('+'), 'negative': asset.change.startsWith('-')}">
+            {{ asset.change }}
+          </span>
+          <span class="asset-risk">Risk: {{ asset.riskScore }}</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="invest-action">
+    <button class="action-btn" (click)="onInvest()" [disabled]="!selectedAsset">Invest Now</button>
+  </div>
+
+  <!-- Panel de confirmación inline para activos de alto riesgo -->
+  <div class="confirmation-panel" *ngIf="pendingConfirmation">
+    <p class="confirmation-message">
+      El activo {{ selectedAsset?.name }} (Risk Score: {{ selectedAsset?.riskScore }}) presenta un riesgo elevado.<br>
+      ¿Desea continuar con la inversión?
+    </p>
+    <div class="confirmation-buttons">
+      <button class="confirm-btn" (click)="confirmInvestment()">Confirmar</button>
+      <button class="cancel-btn" (click)="cancelInvestment()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Panel de resultado de inversión -->
+  <div class="risk-alert" *ngIf="investmentResult && !pendingConfirmation">
+    <p [ngClass]="alertClass">{{ investmentResult }}</p>
+  </div>
+
+  <!-- Sección de Historial de Inversiones -->
+  <div class="history-section">
+    <h3>Historial de Inversiones</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Activo</th>
+          <th>Resultado</th>
+          <th>Valor Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let record of investmentHistory">
+          <td>{{ record.date | date:'shortTime' }}</td>
+          <td>{{ record.asset }} ({{ record.symbol }})</td>
+          <td>{{ record.result }}</td>
+          <td>{{ record.totalAssetValue }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Sección de Gráficos Dinámicos -->
+  <div class="chart-section">
+    <h3>Evolución del Valor Total</h3>
+    <canvas id="investmentChart"></canvas>
+  </div>
+</div>
